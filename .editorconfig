@@ -1,0 +1,17 @@
+# EditorConfig for Java projects (Spring Boot / Microservices)
+# More info: https://editorconfig.org/
+
+# Top-most EditorConfig file.
+root = true
+
+# Applies rule to all Java files.
+[*.java]
+
+# Indentation.
+indent_style = tab
+tab_width = 4
+max_line_length = 160
+
+# Spaces.
+insert_final_newline = true
+trim_trailing_whitespace = true
