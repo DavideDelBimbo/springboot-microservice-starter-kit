@@ -1,8 +1,6 @@
 package it.reply.springboot_microservice_starter_kit.controller;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,16 +13,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import it.reply.springboot_microservice_starter_kit.dto.NoteRequestDTO;
 import it.reply.springboot_microservice_starter_kit.dto.NoteResponseDTO;
+import it.reply.springboot_microservice_starter_kit.service.NoteService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/notes")
+@RequiredArgsConstructor
 public class NoteController {
-	private final List<NoteResponseDTO> notes = new ArrayList<>();
-	private long nextId = 1;
+
+	private final NoteService service;
 
 	/**
 	 * GET /notes
@@ -33,7 +33,8 @@ public class NoteController {
 	 */
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Collection<NoteResponseDTO>> getNotes() {
-		return ResponseEntity.ok(this.notes);
+		Collection<NoteResponseDTO> retrievedNotes = this.service.getNotes();
+		return ResponseEntity.ok(retrievedNotes);
 	}
 
 	/**
@@ -45,12 +46,8 @@ public class NoteController {
 	 */
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<NoteResponseDTO> getNote(@PathVariable Long id) {
-		return this.notes.stream()
-				.filter(note -> note.getId().equals(id))
-				.findFirst()
-				.map(ResponseEntity::ok)
-				.orElseThrow(
-						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
+		NoteResponseDTO retrivedNote = this.service.getNote(id);
+		return ResponseEntity.ok(retrivedNote);
 	}
 
 	/**
@@ -62,9 +59,7 @@ public class NoteController {
 	 */
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<NoteResponseDTO> createNote(@RequestBody NoteRequestDTO request) {
-		NoteResponseDTO createdNote = new NoteResponseDTO(nextId++, request.getTitle(), request.getContent());
-		this.notes.add(createdNote);
-
+		NoteResponseDTO createdNote = this.service.createNote(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdNote);
 	}
 
@@ -78,16 +73,8 @@ public class NoteController {
 	 */
 	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<NoteResponseDTO> updateNote(@PathVariable Long id, @RequestBody NoteRequestDTO request) {
-		NoteResponseDTO retrivedNote = this.notes.stream()
-				.filter(note -> note.getId().equals(id))
-				.findFirst()
-				.orElseThrow(
-						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
-
-		retrivedNote.setTitle(request.getTitle());
-		retrivedNote.setContent(request.getContent());
-
-		return ResponseEntity.ok(retrivedNote);
+		NoteResponseDTO updatedNote = this.service.updateNote(id, request);
+		return ResponseEntity.ok(updatedNote);
 	}
 
 	/**
@@ -99,13 +86,7 @@ public class NoteController {
 	 */
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> deleteNote(@PathVariable Long id) {
-		NoteResponseDTO retrivedNote = this.notes.stream()
-				.filter(note -> note.getId().equals(id))
-				.findFirst()
-				.orElseThrow(
-						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
-
-		this.notes.remove(retrivedNote);
+		this.service.deleteNote(id);
 		return ResponseEntity.noContent().build();
 	}
 }
