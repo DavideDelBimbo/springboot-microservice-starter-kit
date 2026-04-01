@@ -2,13 +2,12 @@ package it.reply.springboot_microservice_starter_kit.service;
 
 import java.util.Collection;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import it.reply.springboot_microservice_starter_kit.dto.NoteRequestDTO;
 import it.reply.springboot_microservice_starter_kit.dto.NoteResponseDTO;
 import it.reply.springboot_microservice_starter_kit.entity.NoteEntity;
+import it.reply.springboot_microservice_starter_kit.exception.NoteNotFoundException;
 import it.reply.springboot_microservice_starter_kit.mapper.NoteMapper;
 import it.reply.springboot_microservice_starter_kit.repository.NoteRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +34,10 @@ public class NoteService {
 	 *
 	 * @param id unique identifier of note to be retrieved.
 	 * @return corresponding {@link NoteResponseDTO} of retrived note.
-	 * @throws ResponseStatusException if no note exists with specified id.
+	 * @throws NoteNotFoundException if no note exists with specified id.
 	 */
 	public NoteResponseDTO getNote(Long id) {
-		NoteEntity retrivedNote = this.repository.findById(id).orElseThrow(
-				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
-
+		NoteEntity retrivedNote = this.repository.findById(id).orElseThrow(() -> new NoteNotFoundException(id));
 		return this.mapper.toResponse(retrivedNote);
 	}
 
@@ -53,7 +50,6 @@ public class NoteService {
 	public NoteResponseDTO createNote(NoteRequestDTO request) {
 		NoteEntity noteEntity = this.mapper.toEntity(request);
 		NoteEntity createdNote = this.repository.save(noteEntity);
-
 		return this.mapper.toResponse(createdNote);
 	}
 
@@ -63,12 +59,10 @@ public class NoteService {
 	 * @param id      unique identifier of note to be updated.
 	 * @param request {@link NoteRequestDTO} with details of note to be updated.
 	 * @return corresponding {@link NoteResponseDTO} of updated note.
-	 * @throws ResponseStatusException if no note exists with specified id.
+	 * @throws NoteNotFoundException if no note exists with specified id.
 	 */
 	public NoteResponseDTO updateNote(Long id, NoteRequestDTO request) {
-		NoteEntity retrivedNote = this.repository.findById(id).orElseThrow(
-				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
-
+		NoteEntity retrivedNote = this.repository.findById(id).orElseThrow(() -> new NoteNotFoundException(id));
 		retrivedNote.setTitle(request.getTitle());
 		retrivedNote.setContent(request.getContent());
 
@@ -80,11 +74,11 @@ public class NoteService {
 	 * Deletes an existing note.
 	 *
 	 * @param id unique identifier of note to be deleted.
-	 * @throws ResponseStatusException if no note exists with specified id.
+	 * @throws NoteNotFoundException if no note exists with specified id.
 	 */
 	public void deleteNote(Long id) {
 		if (!this.repository.existsById(id))
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found");
+			throw new NoteNotFoundException(id);
 
 		this.repository.deleteById(id);
 	}
