@@ -1,3 +1,16 @@
+server:
+  port: 8080
+
+app:
+  title: "@project.name@"
+  description: "@project.description@"
+  version: "@project.version@"
+  url: "@project.url@"
+  developer:
+    name: "@project.developers[0].name@"
+    url: ""
+    email: "@project.developers[0].email@"
+
 spring:
   application.name: "@project.name@"
 
@@ -25,5 +38,8 @@ spring:
       enabled: true
 
 springdoc:
+  api-docs:
+    path: /api-docs
   swagger-ui:
+    path: /swagger-ui.html
     operations-sorter: method

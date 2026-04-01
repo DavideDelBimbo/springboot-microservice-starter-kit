@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "app.title",
+      "type": "java.lang.String",
+      "description": "Application title displayed in the OpenAPI specification."
+    },
+    {
+      "name": "app.version",
+      "type": "java.lang.String",
+      "description": "Application version displayed in the OpenAPI specification."
+    },
+    {
+      "name": "app.description",
+      "type": "java.lang.String",
+      "description": "Application description displayed in the OpenAPI specification."
+    },
+    {
+      "name": "app.url",
+      "type": "java.lang.String",
+      "description": "Application repository URL."
+    },
+    {
+      "name": "app.developer.name",
+      "type": "java.lang.String",
+      "description": "Developer contact name displayed in the OpenAPI specification."
+    },
+    {
+      "name": "app.developer.url",
+      "type": "java.lang.String",
+      "description": "Developer contact URL displayed in the OpenAPI specification."
+    },
+    {
+      "name": "app.developer.email",
+      "type": "java.lang.String",
+      "description": "Developer contact email displayed in the OpenAPI specification."
+    }
+  ]
+}
