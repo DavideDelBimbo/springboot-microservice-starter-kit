@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import it.reply.springboot_microservice_starter_kit.dto.NoteRequestDTO;
 import it.reply.springboot_microservice_starter_kit.dto.NoteResponseDTO;
 import it.reply.springboot_microservice_starter_kit.service.NoteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -58,7 +59,7 @@ public class NoteController {
 	 *         with HTTP 201 status.
 	 */
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<NoteResponseDTO> createNote(@RequestBody NoteRequestDTO request) {
+	public ResponseEntity<NoteResponseDTO> createNote(@Valid @RequestBody NoteRequestDTO request) {
 		NoteResponseDTO createdNote = this.service.createNote(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdNote);
 	}
@@ -72,7 +73,8 @@ public class NoteController {
 	 *         HTTP 404 status if not found.
 	 */
 	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<NoteResponseDTO> updateNote(@PathVariable Long id, @RequestBody NoteRequestDTO request) {
+	public ResponseEntity<NoteResponseDTO> updateNote(@PathVariable Long id,
+			@Valid @RequestBody NoteRequestDTO request) {
 		NoteResponseDTO updatedNote = this.service.updateNote(id, request);
 		return ResponseEntity.ok(updatedNote);
 	}
