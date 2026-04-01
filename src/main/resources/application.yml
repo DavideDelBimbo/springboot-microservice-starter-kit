@@ -37,6 +37,12 @@ spring:
     console:
       enabled: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
 springdoc:
   api-docs:
     path: /api-docs
