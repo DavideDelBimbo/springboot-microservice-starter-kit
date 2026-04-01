@@ -1,2 +1,25 @@
 spring:
   application.name: "@project.name@"
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:devdb
+    username: sa
+    password:
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      "[hibernate.format_sql]": "true"
+
+  sql:
+    init:
+      mode: always
+      schema-locations: file:schema.sql
+
+  h2:
+    console:
+      enabled: true

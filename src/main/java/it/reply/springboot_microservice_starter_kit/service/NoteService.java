@@ -1,8 +1,6 @@
 package it.reply.springboot_microservice_starter_kit.service;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,11 +8,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 import it.reply.springboot_microservice_starter_kit.dto.NoteRequestDTO;
 import it.reply.springboot_microservice_starter_kit.dto.NoteResponseDTO;
+import it.reply.springboot_microservice_starter_kit.entity.NoteEntity;
+import it.reply.springboot_microservice_starter_kit.mapper.NoteMapper;
+import it.reply.springboot_microservice_starter_kit.repository.NoteRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class NoteService {
-	private final List<NoteResponseDTO> notes = new ArrayList<>();
-	private long nextId = 1;
+
+	private final NoteRepository repository;
+	private final NoteMapper mapper;
 
 	/**
 	 * Retrieve all saved notes.
@@ -22,7 +26,8 @@ public class NoteService {
 	 * @return corresponding list of {@link NoteResponseDTO} of all retrieved notes.
 	 */
 	public Collection<NoteResponseDTO> getNotes() {
-		return this.notes;
+		Collection<NoteEntity> retrievedNotes = this.repository.findAll();
+		return retrievedNotes.stream().map(this.mapper::toResponse).toList();
 	}
 
 	/**
@@ -33,11 +38,10 @@ public class NoteService {
 	 * @throws ResponseStatusException if no note exists with specified id.
 	 */
 	public NoteResponseDTO getNote(Long id) {
-		return this.notes.stream()
-				.filter(note -> note.getId().equals(id))
-				.findFirst()
-				.orElseThrow(
-						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
+		NoteEntity retrivedNote = this.repository.findById(id).orElseThrow(
+				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
+
+		return this.mapper.toResponse(retrivedNote);
 	}
 
 	/**
@@ -47,10 +51,10 @@ public class NoteService {
 	 * @return corresponding {@link NoteResponseDTO} of created (generated id).
 	 */
 	public NoteResponseDTO createNote(NoteRequestDTO request) {
-		NoteResponseDTO createdNote = new NoteResponseDTO(nextId++, request.getTitle(), request.getContent());
-		this.notes.add(createdNote);
+		NoteEntity noteEntity = this.mapper.toEntity(request);
+		NoteEntity createdNote = this.repository.save(noteEntity);
 
-		return createdNote;
+		return this.mapper.toResponse(createdNote);
 	}
 
 	/**
@@ -62,16 +66,14 @@ public class NoteService {
 	 * @throws ResponseStatusException if no note exists with specified id.
 	 */
 	public NoteResponseDTO updateNote(Long id, NoteRequestDTO request) {
-		NoteResponseDTO retrivedNote = this.notes.stream()
-				.filter(note -> note.getId().equals(id))
-				.findFirst()
-				.orElseThrow(
-						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
+		NoteEntity retrivedNote = this.repository.findById(id).orElseThrow(
+				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
 
 		retrivedNote.setTitle(request.getTitle());
 		retrivedNote.setContent(request.getContent());
 
-		return retrivedNote;
+		NoteEntity updatedNote = this.repository.save(retrivedNote);
+		return this.mapper.toResponse(updatedNote);
 	}
 
 	/**
@@ -81,12 +83,9 @@ public class NoteService {
 	 * @throws ResponseStatusException if no note exists with specified id.
 	 */
 	public void deleteNote(Long id) {
-		NoteResponseDTO retrivedNote = this.notes.stream()
-				.filter(note -> note.getId().equals(id))
-				.findFirst()
-				.orElseThrow(
-						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found"));
+		if (!this.repository.existsById(id))
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Note with id " + id + " not found");
 
-		this.notes.remove(retrivedNote);
+		this.repository.deleteById(id);
 	}
 }
