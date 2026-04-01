@@ -1,0 +1,61 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.iws
+*.iml
+*.ipr
+.project
+.classpath
+.settings
+.factorypath
+.sts4-cache
+*.code-workspace
+
+# Build output
+target/
+build/
+dist/
+.mvn/wrapper/maven-wrapper.jar
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+.nyc_output/
+coverage/
+
+# Documentation
+HELP.md
+README.md
+*.md (except those needed at runtime)
+
+# Local environment
+.env
+.env.local
+.env.*.local
+
+# Development files
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+azure-pipelines.yml
